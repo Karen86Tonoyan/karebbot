@@ -1,0 +1,53 @@
+ollama serve
+[server]
+address = "0.0.0.0:11434"
+setx OLLAMA_NUM_THREADS 8
+setx OLLAMA_MAX_LOADED_MODELS 2
+setx OLLAMA_NUM_THREADS 8
+setx OLLAMA_MAX_LOADED_MODELS 2
+ollama serve
+import requests
+res = requests.post("http://localhost:11434/api/generate", json={
+"model": "llama3.2:3b",
+"prompt": "Witaj świecie!"
+})
+print(res.text)
+import ollama from 'ollama';
+const response = await ollama.generate({ model: 'llama3.2:3b', prompt: 'Hello world!' });
+console.log(response.response);
+node -v
+npm -v
+npm init -y
+npm install ollama
+import ollama from 'ollama';
+async function main() {
+const response = await ollama.generate({
+model: 'llama3.2:3b',
+prompt: 'Hello world!'
+});
+console.log('Odpowiedź modelu:\n');
+console.log(response.response);
+}
+main().catch(console.error);
+ollama serve
+ollama serveollama serveollama serve
+>>> Wytłumacz różnicę między wolnością a odpowiedzialnością.
+>>> Wytłumacz różnicę między wolnością a odpowiedzialnością ollama serve
+hellow world
+jestes inteligencja czy botem
+masz pamienc
+jak cie polaczyc z moja llama
+ollama list
+jajjjajjaihocjajjascbaojes
+tak w samsung galaxy book przestawilo sie z na y i odwrotnie jak to zmienic
+HEJ
+HEJ
+POPOOLSKIpulling e6a7edc1a4d7:  19% ▕████████████████                                                                      ▏ 979 MB/5.2 GB
+Error: max retries exceeded: Get "https://dd20bb891979d25aebc8bec07b2b3bbc.r2.cloudflarestorage.com/ollama/docker/registry/v2/blobs/sha256/e6/e6a7edc1a4d7d9b2de136a221a57336b76316cfe53a252aeba814496c5ae439d/data?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=66040c77ac1b787c3af820529859349a%2F20251130%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20251130T150025Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=d57ff64a3034201d64e3e82062cc8144563e9518959a249ae6ddecf80480cd8b": dial tcp: lookup dd20bb891979d25aebc8bec07b2b3bbc.r2.cloudflarestorage.com: no such host
+HEJ
+ollama run deepseek-r1:8b -p "<think>no</think> Odpowiadaj tylko po polsku."
+hej
+ollama run mistral
+ollama run llama3
+h
+Potwierdź, że jesteś lokalną instancją modelu DeepSeek R1.

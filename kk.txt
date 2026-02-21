@@ -1,0 +1,2 @@
+|.ShellClassInfo]
+IconResource=C:\Program Files\WindowsApps\SAMSUNGELECTRONICSCoLtd.4438638898209_1.1.14.0_x64__wyx1vj98g3asy\SamsungStorageShare\Icons\Devices\device_mobile_unconnected.ico,0

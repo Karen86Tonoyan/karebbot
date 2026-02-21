@@ -1,0 +1,2118 @@
+diff --git a/README.md b/README.md
+index 9662b8fe8cdc5764c5065ad29920e7d054522af6..1005ac682b37cb3eec3deaa3ab4af4fac19e95b6 100644
+--- a/README.md
++++ b/README.md
+@@ -18,50 +18,57 @@
+     	<img src="https://img.shields.io/github/issues/gramaddict/bot?style=flat"  alt=""/>
+     </a>
+     <a href="https://github.com/GramAddict/bot/pulls">
+       <img src="https://img.shields.io/github/issues-pr/gramaddict/bot?style=flat"  alt=""/>
+     </a>
+     <a href="https://github.com/GramAddict/bot/stargazers">
+ 	    <img src="https://img.shields.io/github/stars/gramaddict/bot?style=flat" alt="">
+     </a>
+     <a href="https://img.shields.io/github/last-commit/gramaddict/bot/master?style=flat">
+ 	    <img src="https://img.shields.io/github/last-commit/GramAddict/bot/master?style=flat" alt="">
+     </a>
+     <a href="https://pypi.org/project/gramaddict/">
+       <img src="https://img.shields.io/pypi/dm/gramaddict" alt="">
+     </a>
+     <a href="https://github.com/GramAddict/bot#backers">
+ 	    <img src="https://img.shields.io/opencollective/backers/gramaddict?style=flat" alt="">
+     </a>
+     <a href="https://discord.gg/NK8PNEFGFF">
+ 	    <img src="https://img.shields.io/discord/771481743471017994?style=flat" alt="">
+     </a>
+     <a href="https://duckduckgo.com/?q=where+can+i+find+old+ig+version+apk&t=newext&atb=v376-1&df=y&ia=web">
+         <img src="https://img.shields.io/badge/partially_works_on_ig_version-263.2.0.19.104-orange" alt="">
+     </a>
+ </p>
+ 
++## Additional documentation
++
++- [Cerber Security v7 – Reference Architecture](docs/cerber_v7_architecture.md)
++- [Cerber Security – Plug-and-Play Packs](docs/cerber_plug_and_play.md)
++- [Cerber upstream repository](https://github.com/karen1986bot/cerber)
++- [Cerber bundle generator](tools/cerber_bundler.py) – concatenate the Cerber docs into a single handoff file with `python tools/cerber_bundler.py`.
++
+ 
+ 
+ <br />
+ 
+ # Why should I automate my Instagram account?
+ It's very hard nowadays to grow an account. Have you ever been on the explore page? IG will show your post only to close accounts & accounts you interact most with, you will never be on the explore page. Nobody will see your beautiful photos, your hilarious memes, or whatever you are posting. But now you can do something about that! With GramAddict you can __get noticed easily__, and if you really deserve it, your account will __grow super fast__!
+ 
+ ## So, do I need to publish good content to grow?
+ Of course you have to! This bot will mainly help you to get the __visibility you deserve__ and which is Instagram not giving you.
+ 
+ ## Ok but I don't know how to start this journey...
+ Don't worry about that now, it's not that hard to start botting with GramAddict! I tried to make it as noob-friendly as possible. In any case, if you follow the docs with all the steps provided, you will make it! You are also invited to join our community and ask for any help!
+ 
+ ## There is a community around this project?
+ Yes! We are on __discord__ and we count a lot of __active users__ you can ask us whatever you want!
+ 
+   <a href="https://discord.gg/NK8PNEFGFF">
+     <img src="https://img.shields.io/discord/771481743471017994?style=flat" alt="">
+   </a>
+ 
+ ## I saw there are a lot of similar projects on GitHub, why should I choose this one?
+ You're right, there are plenty of other bot solutions. Most of them use API requests. However, you will get your account banned if you use API (1-30 days)!
+ There's also a very similar project to this one, yet it's not free and the dev doesn't care about the community much. They removed few lines from the core and ask you for a subscription plan in order to use those features. Furthermore, you don't even know what's the real code during execution - it's encrypted. And if they are stealing something else? Who knows? I don't.
+ This bot is __free to use__ and __open source__, you won't get charged for few extra lines, __EVER__.
+ I'm focused on the community and not on finding ways how to get money out of this project. __I really care about the community__ and every dev should too. 🤗
+diff --git a/docs/cerber_bundle.md b/docs/cerber_bundle.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..b6ae780c945144928be6509a8e23a9d702e252c2
+--- /dev/null
++++ b/docs/cerber_bundle.md
+@@ -0,0 +1,256 @@
++# Cerber Bundle
++
++Concatenated reference for quick sharing.
++
++Generated: 2025-11-26T11:09:48.520160+00:00
++
++Sources:
++- docs/cerber_v7_architecture.md
++- docs/cerber_plug_and_play.md
++
++
++<!-- Begin source: docs/cerber_v7_architecture.md (part 1/2) -->
++
++# Cerber Security v7 – Reference Architecture
++
++This document captures a realistic, production-grade framing for the "living" Cerber stack described in the user brief. It is organized around deployable capabilities for Android, Windows, and server components and avoids speculative mechanisms that cannot be implemented with today’s tooling.
++
++**Upstream repository:** <https://github.com/karen1986bot/cerber> hosts the living builds, issue tracker, and release notes for the Cerber stack referenced throughout this document.
++
++## Goals and Scope
++- Provide layered defense with aggressive monitoring (Guardian) and deception-based capture (Łasuch).
++- Preserve evidence and disrupt live intrusions while remaining legally and operationally viable.
++- Keep the cryptographic vault portable with post-quantum agility (Falcon, SPHINCS+, Dilithium) and hybrid transport (PQXDH/KEM + symmetric channels).
++- Support adaptive behaviour through local telemetry, heuristics, and lightweight reinforcement learning, not uncontrolled self-rewriting code.
++
++## Layered Components
++
++### Capability and Feasibility Matrix
++The table below captures what is realistic on each platform without privileged or unsupported hooks. "Ready" means it can ship with today’s APIs; "Guardrails" highlights required user consent or OS policies.
++
++| Capability | Android | Windows | Server | Notes |
++| --- | --- | --- | --- | --- |
++| Process/socket inventory | Ready | Ready | Ready | Use `/proc`, `ps`, `netstat`; ETW/WMI on Windows. |
++| ADB/root exposure checks | Ready | N/A | N/A | Detect `ro.debuggable`, `adbd`, hidden `su`; prompt user if USB debugging stays enabled. |
++| Call-forward/operator audit | Ready (read-only) | N/A | N/A | Parse IMS/telephony logs where permitted; never alter operator state. |
++| DLL/code injection detection | N/A | Ready | N/A | ETW + module enumeration; block/kill via normal process ACLs only. |
++| VPN/rogue tunnel detection | Ready | Ready | N/A | Enumerate active interfaces and default routes; flag unsigned adapters. |
++| Honeypot/decoy assets | Ready | Ready | Ready | Expose fake files/services under user-approved sandbox paths. |
++| Evidence collection (files, hashes, screenshots) | Guardrails | Ready | Ready | Android: scope storage + runtime consent; Windows/Server: adhere to user ACLs. |
++| Network kill/containment | Guardrails | Ready | Ready | Android: revoke app’s own network or use VPN lockdown; Windows: disable adapters/firewall rules. |
++| PQ vault (Falcon/SPHINCS+/Dilithium) | Ready (placeholder/NDK) | Ready | Ready | Swap providers: placeholder vs. OQS or hardware-backed engines. |
++| Local anomaly learning | Ready | Ready | Ready | Lightweight models refreshed from telemetry; no self-modifying binaries. |
++
++### 1) Anti-Forensic "White Noise"
++Techniques to reduce forensic signal without breaking the platform.
++- **Android**: shrink log buffers (`logcat -G 1M`), periodic random junk traffic, process renaming where permitted, and scoped storage paths to hide operational artifacts.
++- **Windows**: short-retention process scans (~150 ms cadence), randomized benign events to obfuscate timelines, and log/path obfuscation that avoids tampering with system audit providers.
++
++### 2) Guardian (360° Monitor)
++Continuous health and tamper monitoring with clear alerting.
++- **Process and network**: enumerate processes and sockets; flag DLL/code injections and suspicious bindings (e.g., unexpected local forwards).
++- **Root/debug exposure**: detect hidden `su`, ADB debugging, shell injection, rogue VPN, and call-forward indicators (operator/IMS logs) on Android; inspect debug privileges and hooks on Windows.
++- **User notification**: emit actionable alerts ("unauthorized traffic from process X → blocked") to the Cerber panel.
++
++### 3) Łasuch (Reverse Antivirus / Deception)
++A honeypot layer that attracts and contains malware instead of blocking blindly.
++- Expose decoy services or files that look vulnerable, then capture payloads and execution traces.
++- Package recovered artifacts (binaries, scripts, network captures, memory snapshots) into encrypted evidence bundles.
++- Forward evidence to CERT/server endpoints or store in an offline vault for later analysis.
++
++### 4) Vault (Post-Quantum Crypto Core)
++Portable cryptography with explicit agility and testing fallbacks.
++- Support Falcon, SPHINCS+, and Dilithium signatures plus hybrid PQXDH/KEM key exchange; default to placeholder implementations when hardware libraries are absent.
++- Provide signing/verification APIs that can swap between placeholder and OQS-backed providers without changing call sites.
++- Favor concise framing (base64 JSON frames) for interoperability with shell tooling and constrained transports.
++
++### 5) Evidence Capture & Intrusion Disruption
++Pragmatic responses that are supportable on target platforms.
++- Collect: process memory snapshots (where permitted), file hashes (SHA-512), timestamps, screenshots, and optional mic/network captures when an attack is active.
++- Store under structured vault paths (e.g., `/Cerber/Vault/Evidence/YYYY-MM-DD/`) and upload through controlled channels (SMTP/HTTPS/push).
++- Disrupt by cutting network access, terminating offending processes, forcing sandbox resets, or crashing only the isolated container—not the host OS.
++
++**Event flow (minimal viable pipeline)**
++1. Guardian or Łasuch raises an alert with context (process, network endpoint, indicator).
++2. Evidence collector snapshots permitted artifacts and signs the bundle via the selected PQ provider.
++3. Notification panel surfaces the alert locally; optional upstream submission posts JSON + evidence archive to hardened endpoints.
++4. Living Code Engine ingests the alert outcome (dismissed, blocked, escalated) to refine heuristics and regenerate rules.
++
++### 6) Living Code Engine
++Adaptive behaviour via telemetry-driven models and versioned rule regeneration.
++- Maintain local profiles of normal process/network baselines per host.
++- Detect anomalies with heuristic scoring plus lightweight models (decision trees/XGBoost). Reinforcement-learning policies refine allow/block rules over time.
++- Regenerate rulesets (e.g., `rules.json` or generated Python rule modules) periodically from telemetry; updates are auditable and reversible.
++- **Implementation hook:** `tools/living_code_engine.py` consumes tagged telemetry (benign vs. malicious), recomputes thresholds, bumps a version counter, and rewrites a generated rule module under `~/.cerber/living_code/living_rules.py`. The engine is deterministic, keeps a JSONL history, and annotates each generation with timestamps so changes remain explainable.
++- **Self-sufficiency & masking:** the engine keeps a masked copy of every generated module and a checksum manifest. If the live `living_rules.py` disappears or is tampered with, `LivingCodeEngine.self_heal()` restores the latest good copy from the masked stash so Cerber can regenerate itself without network pulls.
++
++### 7) Notification Panel
++Unified surface for Guardian and Łasuch events.
++- Aggregates alerts: monitoring violations, deception captures, vault events, and evidence status.
++- Provides operator controls to approve remediation (kill, isolate, upload evidence) and review historical alerts.
++
++## Deployment Notes
++- **Android**: ship monitoring and vault logic via Kivy/NDK components; gate sensitive actions behind user consent and platform security policies.
++- **Windows**: pair Python orchestration with native helpers (C/C++ or ETW/WMI integrations) for process/network inspection and evidence capture.
++- **Server**: harden ingestion endpoints; validate signatures from vault events; store evidence with integrity metadata and retention policies.
++
++### Rollout checklist (per platform)
++- Baseline telemetry shapes (normal process list, socket inventory, and network routes).
++- User-consent prompts for evidence capture and network containment actions.
++- Provider selection for the vault: placeholder for tests, OQS/hardware for production.
++- Alert routing wired to the notification panel and remote ingest endpoints.
++- Automated retention and redaction policies for stored evidence.
++
++## Non-Goals and Guardrails
++- No unsupported "psychological" effects; disruption stays technical (process/network isolation).
++- No uncontrolled self-rewriting binaries; learning is constrained to data-driven rule updates.
++- Respect platform security models and legal boundaries for data capture and transmission.
++
++
++<!-- End source: docs/cerber_v7_architecture.md -->
++
++
++<!-- Begin source: docs/cerber_plug_and_play.md (part 2/2) -->
++
++# Cerber Security – Plug-and-Play Packs
++
++This guide enumerates the drop-in bundles that live in this repository so you can start exercising the Cerber v7 concepts without wiring a full production stack. Each pack is self contained, favors minimal dependencies, and is designed to run from a clean checkout.
++
++## Contents at a Glance
++- **Upstream repository** – <https://github.com/karen1986bot/cerber> for the living Cerber builds and issue tracking.
++
++## Living Code drills
++The living rules engine now self-regenerates from telemetry so you can see Cerber evolve locally without additional dependencies.
++- Run `python tools/living_code_engine.py` to generate `~/.cerber/living_code/living_rules.py` with sample data and a version bump.
++- Feed your own tagged events by importing `TelemetryEvent` from `tools.living_code_engine` and calling `LivingCodeEngine.update_rules([...])`. The engine keeps JSONL history and stamps each generation with a timestamp for auditability.
++- If malware or cleanup tools delete the generated module, call `LivingCodeEngine.self_heal()` (or run `python tools/living_code_engine.py` again) to restore the latest good copy from the masked stash recorded in `mask_manifest.json`.
++
++- **Vault CLI (PQ signatures & frames)** – `extra/pqxhybrid/cli.py`, dependency-free placeholders with optional OQS provider auto-registration.
++- **Architecture & rollout playbooks** – `docs/cerber_v7_architecture.md` for the layered reference model and deployment guardrails.
++- **Test harness** – `test/test_pqxhybrid.py` and `test/test_telegram.py` for regression coverage and fixture sanity.
++
++## Quick Start: Vault Pack (Python, cross-platform)
++1. From the repository root, generate keys for a scheme:
++   ```bash
++   python -m extra.pqxhybrid.cli keygen falcon
++   ```
++2. Sign a payload (base64 frame output):
++   ```bash
++   python -m extra.pqxhybrid.cli sign falcon <public_key_base64> <secret_key_base64> "hello-cerber"
++   ```
++3. Verify the frame (returns non-zero exit code on tamper):
++   ```bash
++   python -m extra.pqxhybrid.cli verify <public_key_base64> '{"scheme":"falcon","payload":"aGVsbG8tY2VyYmVy","signature":"..."}'
++   ```
++
++These commands use deterministic placeholder primitives by default. If `python -m pip install oqs` succeeds on your platform, the CLI will automatically register real Falcon/SPHINCS+/Dilithium providers backed by liboqs.
++
++## Quick Start: Guardian/Łasuch Playbook
++The repository now ships self-contained probes so you can run exercises directly:
++
++### Guardian snapshot (cross-platform)
++```bash
++python -m tools.guardian_probe
++# writes ~/.cerber/evidence/guardian/<timestamp>/processes.txt + network.txt
++```
++
++### Łasuch honeypot (TCP listener)
++```bash
++python -m tools.lasuch_honeypot --  # Ctrl+C to stop
++# captures payloads to ~/.cerber/evidence/lasuch/capture_<timestamp>.json
++```
++
++### White-noise emitter
++```bash
++python -m tools.white_noise
++# appends timestamped noise lines to ~/.cerber/noise.log
++```
++
++If you prefer shell-only probes, the original playbook remains valid:
++
++#### Windows (PowerShell)
++```powershell
++# 1) Process/network sweep
++Get-Process | Select-Object Name,Id,Path,CPU
++netstat -ano | Select-String ":443"
++
++# 2) Hook/DLL glance
++Get-Process | ForEach-Object { $_.Modules | Select-Object ModuleName,FileName }
++
++# 3) Evidence drop (zip + hash)
++$stamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
++$folder = "$env:TEMP\cerber_evidence_$stamp"
++New-Item -ItemType Directory -Path $folder | Out-Null
++Get-Process | Export-Csv "$folder\processes.csv" -NoTypeInformation
++Get-FileHash "$folder\processes.csv" -Algorithm SHA512 | Out-File "$folder\hash.txt"
++Compress-Archive -Path $folder\* -DestinationPath "$folder.zip"
++```
++
++#### Android (ADB shell)
++```bash
++# 1) Shrink and churn logs
++logcat -G 1M && logcat -c
++
++# 2) Network and debug exposure checks
++getprop ro.debuggable
++netstat -anp | head -n 20
++pm list packages | grep -i vpn
++
++# 3) Evidence capture skeleton (scoped storage)
++STAMP=$(date +%Y-%m-%d_%H%M%S)
++BASE="/sdcard/Cerber/Evidence/$STAMP"
++mkdir -p "$BASE" && logcat -d > "$BASE/logcat.txt" && dumpsys package > "$BASE/pkg.txt"
++```
++
++Wire the outputs from these probes to the notification panel or remote ingest endpoints defined in the architecture doc.
++
++## Quick Start: Server Ingest Stub
++Deploy a minimal HTTP endpoint that accepts signed frames from the vault and writes them to an evidence directory.
++
++```python
++# save as tools/cerber_ingest_stub.py
++import base64
++import http.server
++import json
++import pathlib
++from extra import pqxhybrid
++
++OUT = pathlib.Path("/tmp/cerber_ingest")
++OUT.mkdir(parents=True, exist_ok=True)
++
++class Handler(http.server.BaseHTTPRequestHandler):
++    def do_POST(self):
++        length = int(self.headers.get("content-length", 0))
++        body = self.rfile.read(length)
++        frame = json.loads(body)
++        public = base64.b64decode(frame["public_key"]) if "public_key" in frame else None
++        payload = frame["frame"]
++        if public is None:
++            self.send_error(400, "public_key missing")
++            return
++        if pqxhybrid.verify_frame(payload, public):
++            OUT.joinpath("frame.json").write_text(json.dumps(frame, indent=2))
++            self.send_response(200); self.end_headers(); self.wfile.write(b"ok")
++        else:
++            self.send_error(400, "invalid signature")
++
++if __name__ == "__main__":
++    http.server.HTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
++```
++
++Run it with:
++```bash
++python tools/cerber_ingest_stub.py
++```
++Use `curl -X POST http://localhost:8080 -d @frame.json` to replay frames produced by the Vault CLI.
++
++## Repository Map
++- `docs/cerber_v7_architecture.md` – reference design, feasibility, guardrails, and rollout checklist.
++- `docs/cerber_plug_and_play.md` – this plug-and-play guide.
++- `extra/pqxhybrid/` – pluggable placeholder + optional OQS-backed PQ signature helpers and CLI.
++- `test/` – regression tests covering the PQ helpers and Telegram fixtures.
++
++Start with the Vault pack for signing/verification, layer on the Guardian/Łasuch probes for visibility, and then route events into the server ingest stub for end-to-end exercises.
++
++
++<!-- End source: docs/cerber_plug_and_play.md -->
+diff --git a/docs/cerber_plug_and_play.md b/docs/cerber_plug_and_play.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..d54471585bbe02fbd1608bb5a48073d7e7eee5ce
+--- /dev/null
++++ b/docs/cerber_plug_and_play.md
+@@ -0,0 +1,140 @@
++# Cerber Security – Plug-and-Play Packs
++
++This guide enumerates the drop-in bundles that live in this repository so you can start exercising the Cerber v7 concepts without wiring a full production stack. Each pack is self contained, favors minimal dependencies, and is designed to run from a clean checkout.
++
++## Contents at a Glance
++- **Upstream repository** – <https://github.com/karen1986bot/cerber> for the living Cerber builds and issue tracking.
++- **Bundle generator** – run `python tools/cerber_bundler.py` to concatenate this guide with the reference architecture into `docs/cerber_bundle.md` for quick sharing.
++
++## Living Code drills
++The living rules engine now self-regenerates from telemetry so you can see Cerber evolve locally without additional dependencies.
++- Run `python tools/living_code_engine.py` to generate `~/.cerber/living_code/living_rules.py` with sample data and a version bump.
++- Feed your own tagged events by importing `TelemetryEvent` from `tools.living_code_engine` and calling `LivingCodeEngine.update_rules([...])`. The engine keeps JSONL history and stamps each generation with a timestamp for auditability.
++- If malware or cleanup tools delete the generated module, call `LivingCodeEngine.self_heal()` (or run `python tools/living_code_engine.py` again) to restore the latest good copy from the masked stash recorded in `mask_manifest.json`.
++
++- **Vault CLI (PQ signatures & frames)** – `extra/pqxhybrid/cli.py`, dependency-free placeholders with optional OQS provider auto-registration.
++- **Architecture & rollout playbooks** – `docs/cerber_v7_architecture.md` for the layered reference model and deployment guardrails.
++- **Test harness** – `test/test_pqxhybrid.py` and `test/test_telegram.py` for regression coverage and fixture sanity.
++
++## Quick Start: Vault Pack (Python, cross-platform)
++1. From the repository root, generate keys for a scheme:
++   ```bash
++   python -m extra.pqxhybrid.cli keygen falcon
++   ```
++2. Sign a payload (base64 frame output):
++   ```bash
++   python -m extra.pqxhybrid.cli sign falcon <public_key_base64> <secret_key_base64> "hello-cerber"
++   ```
++3. Verify the frame (returns non-zero exit code on tamper):
++   ```bash
++   python -m extra.pqxhybrid.cli verify <public_key_base64> '{"scheme":"falcon","payload":"aGVsbG8tY2VyYmVy","signature":"..."}'
++   ```
++
++These commands use deterministic placeholder primitives by default. If `python -m pip install oqs` succeeds on your platform, the CLI will automatically register real Falcon/SPHINCS+/Dilithium providers backed by liboqs.
++
++## Quick Start: Guardian/Łasuch Playbook
++The repository now ships self-contained probes so you can run exercises directly:
++
++### Guardian snapshot (cross-platform)
++```bash
++python -m tools.guardian_probe
++# writes ~/.cerber/evidence/guardian/<timestamp>/processes.txt + network.txt
++```
++
++### Łasuch honeypot (TCP listener)
++```bash
++python -m tools.lasuch_honeypot --  # Ctrl+C to stop
++# captures payloads to ~/.cerber/evidence/lasuch/capture_<timestamp>.json
++```
++
++### White-noise emitter
++```bash
++python -m tools.white_noise
++# appends timestamped noise lines to ~/.cerber/noise.log
++```
++
++If you prefer shell-only probes, the original playbook remains valid:
++
++#### Windows (PowerShell)
++```powershell
++# 1) Process/network sweep
++Get-Process | Select-Object Name,Id,Path,CPU
++netstat -ano | Select-String ":443"
++
++# 2) Hook/DLL glance
++Get-Process | ForEach-Object { $_.Modules | Select-Object ModuleName,FileName }
++
++# 3) Evidence drop (zip + hash)
++$stamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
++$folder = "$env:TEMP\cerber_evidence_$stamp"
++New-Item -ItemType Directory -Path $folder | Out-Null
++Get-Process | Export-Csv "$folder\processes.csv" -NoTypeInformation
++Get-FileHash "$folder\processes.csv" -Algorithm SHA512 | Out-File "$folder\hash.txt"
++Compress-Archive -Path $folder\* -DestinationPath "$folder.zip"
++```
++
++#### Android (ADB shell)
++```bash
++# 1) Shrink and churn logs
++logcat -G 1M && logcat -c
++
++# 2) Network and debug exposure checks
++getprop ro.debuggable
++netstat -anp | head -n 20
++pm list packages | grep -i vpn
++
++# 3) Evidence capture skeleton (scoped storage)
++STAMP=$(date +%Y-%m-%d_%H%M%S)
++BASE="/sdcard/Cerber/Evidence/$STAMP"
++mkdir -p "$BASE" && logcat -d > "$BASE/logcat.txt" && dumpsys package > "$BASE/pkg.txt"
++```
++
++Wire the outputs from these probes to the notification panel or remote ingest endpoints defined in the architecture doc.
++
++## Quick Start: Server Ingest Stub
++Deploy a minimal HTTP endpoint that accepts signed frames from the vault and writes them to an evidence directory.
++
++```python
++# save as tools/cerber_ingest_stub.py
++import base64
++import http.server
++import json
++import pathlib
++from extra import pqxhybrid
++
++OUT = pathlib.Path("/tmp/cerber_ingest")
++OUT.mkdir(parents=True, exist_ok=True)
++
++class Handler(http.server.BaseHTTPRequestHandler):
++    def do_POST(self):
++        length = int(self.headers.get("content-length", 0))
++        body = self.rfile.read(length)
++        frame = json.loads(body)
++        public = base64.b64decode(frame["public_key"]) if "public_key" in frame else None
++        payload = frame["frame"]
++        if public is None:
++            self.send_error(400, "public_key missing")
++            return
++        if pqxhybrid.verify_frame(payload, public):
++            OUT.joinpath("frame.json").write_text(json.dumps(frame, indent=2))
++            self.send_response(200); self.end_headers(); self.wfile.write(b"ok")
++        else:
++            self.send_error(400, "invalid signature")
++
++if __name__ == "__main__":
++    http.server.HTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
++```
++
++Run it with:
++```bash
++python tools/cerber_ingest_stub.py
++```
++Use `curl -X POST http://localhost:8080 -d @frame.json` to replay frames produced by the Vault CLI.
++
++## Repository Map
++- `docs/cerber_v7_architecture.md` – reference design, feasibility, guardrails, and rollout checklist.
++- `docs/cerber_plug_and_play.md` – this plug-and-play guide.
++- `extra/pqxhybrid/` – pluggable placeholder + optional OQS-backed PQ signature helpers and CLI.
++- `test/` – regression tests covering the PQ helpers and Telegram fixtures.
++
++Start with the Vault pack for signing/verification, layer on the Guardian/Łasuch probes for visibility, and then route events into the server ingest stub for end-to-end exercises.
+diff --git a/docs/cerber_v7_architecture.md b/docs/cerber_v7_architecture.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..e830128e0f917f7eb4cb608d33714dbbed23966c
+--- /dev/null
++++ b/docs/cerber_v7_architecture.md
+@@ -0,0 +1,94 @@
++# Cerber Security v7 – Reference Architecture
++
++This document captures a realistic, production-grade framing for the "living" Cerber stack described in the user brief. It is organized around deployable capabilities for Android, Windows, and server components and avoids speculative mechanisms that cannot be implemented with today’s tooling.
++
++**Upstream repository:** <https://github.com/karen1986bot/cerber> hosts the living builds, issue tracker, and release notes for the Cerber stack referenced throughout this document.
++
++## Goals and Scope
++- Provide layered defense with aggressive monitoring (Guardian) and deception-based capture (Łasuch).
++- Preserve evidence and disrupt live intrusions while remaining legally and operationally viable.
++- Keep the cryptographic vault portable with post-quantum agility (Falcon, SPHINCS+, Dilithium) and hybrid transport (PQXDH/KEM + symmetric channels).
++- Support adaptive behaviour through local telemetry, heuristics, and lightweight reinforcement learning, not uncontrolled self-rewriting code.
++
++## Layered Components
++
++### Capability and Feasibility Matrix
++The table below captures what is realistic on each platform without privileged or unsupported hooks. "Ready" means it can ship with today’s APIs; "Guardrails" highlights required user consent or OS policies.
++
++| Capability | Android | Windows | Server | Notes |
++| --- | --- | --- | --- | --- |
++| Process/socket inventory | Ready | Ready | Ready | Use `/proc`, `ps`, `netstat`; ETW/WMI on Windows. |
++| ADB/root exposure checks | Ready | N/A | N/A | Detect `ro.debuggable`, `adbd`, hidden `su`; prompt user if USB debugging stays enabled. |
++| Call-forward/operator audit | Ready (read-only) | N/A | N/A | Parse IMS/telephony logs where permitted; never alter operator state. |
++| DLL/code injection detection | N/A | Ready | N/A | ETW + module enumeration; block/kill via normal process ACLs only. |
++| VPN/rogue tunnel detection | Ready | Ready | N/A | Enumerate active interfaces and default routes; flag unsigned adapters. |
++| Honeypot/decoy assets | Ready | Ready | Ready | Expose fake files/services under user-approved sandbox paths. |
++| Evidence collection (files, hashes, screenshots) | Guardrails | Ready | Ready | Android: scope storage + runtime consent; Windows/Server: adhere to user ACLs. |
++| Network kill/containment | Guardrails | Ready | Ready | Android: revoke app’s own network or use VPN lockdown; Windows: disable adapters/firewall rules. |
++| PQ vault (Falcon/SPHINCS+/Dilithium) | Ready (placeholder/NDK) | Ready | Ready | Swap providers: placeholder vs. OQS or hardware-backed engines. |
++| Local anomaly learning | Ready | Ready | Ready | Lightweight models refreshed from telemetry; no self-modifying binaries. |
++
++### 1) Anti-Forensic "White Noise"
++Techniques to reduce forensic signal without breaking the platform.
++- **Android**: shrink log buffers (`logcat -G 1M`), periodic random junk traffic, process renaming where permitted, and scoped storage paths to hide operational artifacts.
++- **Windows**: short-retention process scans (~150 ms cadence), randomized benign events to obfuscate timelines, and log/path obfuscation that avoids tampering with system audit providers.
++
++### 2) Guardian (360° Monitor)
++Continuous health and tamper monitoring with clear alerting.
++- **Process and network**: enumerate processes and sockets; flag DLL/code injections and suspicious bindings (e.g., unexpected local forwards).
++- **Root/debug exposure**: detect hidden `su`, ADB debugging, shell injection, rogue VPN, and call-forward indicators (operator/IMS logs) on Android; inspect debug privileges and hooks on Windows.
++- **User notification**: emit actionable alerts ("unauthorized traffic from process X → blocked") to the Cerber panel.
++
++### 3) Łasuch (Reverse Antivirus / Deception)
++A honeypot layer that attracts and contains malware instead of blocking blindly.
++- Expose decoy services or files that look vulnerable, then capture payloads and execution traces.
++- Package recovered artifacts (binaries, scripts, network captures, memory snapshots) into encrypted evidence bundles.
++- Forward evidence to CERT/server endpoints or store in an offline vault for later analysis.
++
++### 4) Vault (Post-Quantum Crypto Core)
++Portable cryptography with explicit agility and testing fallbacks.
++- Support Falcon, SPHINCS+, and Dilithium signatures plus hybrid PQXDH/KEM key exchange; default to placeholder implementations when hardware libraries are absent.
++- Provide signing/verification APIs that can swap between placeholder and OQS-backed providers without changing call sites.
++- Favor concise framing (base64 JSON frames) for interoperability with shell tooling and constrained transports.
++
++### 5) Evidence Capture & Intrusion Disruption
++Pragmatic responses that are supportable on target platforms.
++- Collect: process memory snapshots (where permitted), file hashes (SHA-512), timestamps, screenshots, and optional mic/network captures when an attack is active.
++- Store under structured vault paths (e.g., `/Cerber/Vault/Evidence/YYYY-MM-DD/`) and upload through controlled channels (SMTP/HTTPS/push).
++- Disrupt by cutting network access, terminating offending processes, forcing sandbox resets, or crashing only the isolated container—not the host OS.
++
++**Event flow (minimal viable pipeline)**
++1. Guardian or Łasuch raises an alert with context (process, network endpoint, indicator).
++2. Evidence collector snapshots permitted artifacts and signs the bundle via the selected PQ provider.
++3. Notification panel surfaces the alert locally; optional upstream submission posts JSON + evidence archive to hardened endpoints.
++4. Living Code Engine ingests the alert outcome (dismissed, blocked, escalated) to refine heuristics and regenerate rules.
++
++### 6) Living Code Engine
++Adaptive behaviour via telemetry-driven models and versioned rule regeneration.
++- Maintain local profiles of normal process/network baselines per host.
++- Detect anomalies with heuristic scoring plus lightweight models (decision trees/XGBoost). Reinforcement-learning policies refine allow/block rules over time.
++- Regenerate rulesets (e.g., `rules.json` or generated Python rule modules) periodically from telemetry; updates are auditable and reversible.
++- **Implementation hook:** `tools/living_code_engine.py` consumes tagged telemetry (benign vs. malicious), recomputes thresholds, bumps a version counter, and rewrites a generated rule module under `~/.cerber/living_code/living_rules.py`. The engine is deterministic, keeps a JSONL history, and annotates each generation with timestamps so changes remain explainable.
++- **Self-sufficiency & masking:** the engine keeps a masked copy of every generated module and a checksum manifest. If the live `living_rules.py` disappears or is tampered with, `LivingCodeEngine.self_heal()` restores the latest good copy from the masked stash so Cerber can regenerate itself without network pulls.
++
++### 7) Notification Panel
++Unified surface for Guardian and Łasuch events.
++- Aggregates alerts: monitoring violations, deception captures, vault events, and evidence status.
++- Provides operator controls to approve remediation (kill, isolate, upload evidence) and review historical alerts.
++
++## Deployment Notes
++- **Android**: ship monitoring and vault logic via Kivy/NDK components; gate sensitive actions behind user consent and platform security policies.
++- **Windows**: pair Python orchestration with native helpers (C/C++ or ETW/WMI integrations) for process/network inspection and evidence capture.
++- **Server**: harden ingestion endpoints; validate signatures from vault events; store evidence with integrity metadata and retention policies.
++
++### Rollout checklist (per platform)
++- Baseline telemetry shapes (normal process list, socket inventory, and network routes).
++- User-consent prompts for evidence capture and network containment actions.
++- Provider selection for the vault: placeholder for tests, OQS/hardware for production.
++- Alert routing wired to the notification panel and remote ingest endpoints.
++- Automated retention and redaction policies for stored evidence.
++
++## Non-Goals and Guardrails
++- No unsupported "psychological" effects; disruption stays technical (process/network isolation).
++- No uncontrolled self-rewriting binaries; learning is constrained to data-driven rule updates.
++- Respect platform security models and legal boundaries for data capture and transmission.
+diff --git a/extra/pqxhybrid/__init__.py b/extra/pqxhybrid/__init__.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..dd93272ed6939d337a0f89459a7be68041b03c8c
+--- /dev/null
++++ b/extra/pqxhybrid/__init__.py
+@@ -0,0 +1,372 @@
++"""Pluggable helpers for simulating hybrid post-quantum signatures.
++
++The code base that inspired this exercise expects Falcon, SPHINCS+, and
++Dilithium signatures to be available on constrained hardware.  Shipping those
++heavyweight implementations (and their transitive dependencies) with this
++repository would add significant maintenance burden, so the helpers exposed by
++this module are *pluggable*:
++
++``PlaceholderProvider``
++    A small deterministic implementation that mimics the control flow of the
++    real cryptographic primitives.  It is dependency-free and therefore always
++    available.  The implementation is **not secure** and must only be used for
++    testing.
++
++``OQSProvider``
++    When the optional :mod:`oqs` package (Open Quantum Safe) is installed the
++    module automatically registers providers backed by the reference
++    implementations bundled with OQS.  This allows real signing and verifying
++    without changing the public API.
++
++The public helpers (:func:`generate_keypair`, :func:`sign_message`,
++:func:`verify_message`, :func:`sign_frame`, :func:`verify_frame`) always route
++through the currently registered provider for a scheme.  Downstream code can
++override or unregister providers at runtime which makes the module flexible for
++experimentation, integration tests, or future hardware accelerators.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass
++import base64
++import hashlib
++import json
++import secrets
++from typing import Dict, Iterable, Optional, Protocol, Tuple
++
++__all__ = [
++    "AlgorithmSpec",
++    "PQKeyPair",
++    "UnsupportedSchemeError",
++    "InvalidSignatureError",
++    "FrameFormatError",
++    "generate_keypair",
++    "sign_message",
++    "verify_message",
++    "sign_frame",
++    "verify_frame",
++    "available_schemes",
++    "register_provider",
++    "unregister_provider",
++]
++
++
++class UnsupportedSchemeError(ValueError):
++    """Raised when an unsupported signature scheme is requested."""
++
++
++class InvalidSignatureError(ValueError):
++    """Raised when signature verification fails."""
++
++
++class FrameFormatError(ValueError):
++    """Raised when a serialized frame cannot be decoded."""
++
++
++@dataclass(frozen=True)
++class AlgorithmSpec:
++    """Simple container describing algorithm-specific constants."""
++
++    name: str
++    secret_size: int
++    public_size: int
++    signature_size: int
++    personalization: bytes
++
++
++@dataclass(frozen=True)
++class PQKeyPair:
++    """Represents a placeholder key pair for a post-quantum scheme."""
++
++    scheme: str
++    public_key: bytes
++    secret_key: bytes
++
++    def encode(self) -> Tuple[str, str, str]:
++        """Return tuple with the scheme and base64-encoded key material."""
++
++        return (
++            self.scheme,
++            base64.b64encode(self.public_key).decode("ascii"),
++            base64.b64encode(self.secret_key).decode("ascii"),
++        )
++
++
++class SignatureProvider(Protocol):
++    """Interface implemented by all concrete signature providers."""
++
++    spec: AlgorithmSpec
++
++    def generate_keypair(self, seed: Optional[bytes]) -> PQKeyPair:
++        """Create a new :class:`PQKeyPair`.
++
++        Providers may ignore ``seed`` when deterministic key generation is not
++        supported.  Callers should therefore treat seeded output as a best
++        effort optimisation useful primarily for testing.
++        """
++
++    def sign(self, message: bytes, keypair: PQKeyPair) -> bytes:
++        """Return a signature for ``message`` using ``keypair``."""
++
++    def verify(self, message: bytes, signature: bytes, public_key: bytes) -> bool:
++        """Return ``True`` when ``signature`` is valid for ``message``."""
++
++
++_PROVIDERS: Dict[str, SignatureProvider] = {}
++
++
++def _shake(data: Iterable[bytes], length: int) -> bytes:
++    digest = hashlib.shake_256()
++    for chunk in data:
++        digest.update(chunk)
++    return digest.digest(length)
++
++
++def _get_provider(scheme: str) -> SignatureProvider:
++    try:
++        return _PROVIDERS[scheme.lower()]
++    except KeyError as exc:  # pragma: no cover - defensive guard
++        raise UnsupportedSchemeError(f"Unsupported scheme: {scheme}") from exc
++
++
++def available_schemes() -> Tuple[str, ...]:
++    """Return the registered scheme identifiers."""
++
++    return tuple(_PROVIDERS.keys())
++
++
++def register_provider(scheme: str, provider: SignatureProvider, *, override: bool = False) -> None:
++    """Register ``provider`` for ``scheme``.
++
++    Parameters
++    ----------
++    scheme:
++        Name of the algorithm (case-insensitive).
++    provider:
++        Object implementing :class:`SignatureProvider`.
++    override:
++        When ``True`` an existing provider will be replaced.  The flag defaults
++        to ``False`` to avoid surprising call sites.
++    """
++
++    key = scheme.lower()
++    if key in _PROVIDERS and not override:
++        raise ValueError(f"Provider already registered for {scheme}")
++    _PROVIDERS[key] = provider
++
++
++def unregister_provider(scheme: str) -> None:
++    """Remove the provider registered for ``scheme``."""
++
++    try:
++        del _PROVIDERS[scheme.lower()]
++    except KeyError as exc:  # pragma: no cover - defensive guard
++        raise UnsupportedSchemeError(f"Unsupported scheme: {scheme}") from exc
++
++
++class PlaceholderProvider:
++    """Deterministic provider used when real PQ primitives are unavailable."""
++
++    def __init__(self, spec: AlgorithmSpec):
++        self.spec = spec
++
++    def _derive_public_key(self, secret_key: bytes) -> bytes:
++        return _shake((secret_key, self.spec.personalization, b"pk"), self.spec.public_size)
++
++    def generate_keypair(self, seed: Optional[bytes]) -> PQKeyPair:
++        if seed is None:
++            seed = secrets.token_bytes(self.spec.secret_size)
++        secret_key = _shake((seed, self.spec.personalization, b"sk"), self.spec.secret_size)
++        public_key = self._derive_public_key(secret_key)
++        return PQKeyPair(scheme=self.spec.name, public_key=public_key, secret_key=secret_key)
++
++    def sign(self, message: bytes, keypair: PQKeyPair) -> bytes:
++        if keypair.scheme.lower() != self.spec.name:
++            raise InvalidSignatureError(
++                f"Key pair scheme mismatch: expected {self.spec.name}, received {keypair.scheme}"
++            )
++        derived_public = self._derive_public_key(keypair.secret_key)
++        if derived_public != keypair.public_key:
++            raise InvalidSignatureError("Key pair mismatch; secret/public key do not align.")
++        return _shake(
++            (self.spec.personalization, keypair.public_key, message, b"sig"),
++            self.spec.signature_size,
++        )
++
++    def verify(self, message: bytes, signature: bytes, public_key: bytes) -> bool:
++        expected = _shake(
++            (self.spec.personalization, public_key, message, b"sig"),
++            self.spec.signature_size,
++        )
++        return secrets.compare_digest(signature, expected)
++
++
++def _register_default_placeholders() -> None:
++    register_provider(
++        "falcon",
++        PlaceholderProvider(
++            AlgorithmSpec(
++                name="falcon",
++                secret_size=48,
++                public_size=48,
++                signature_size=56,
++                personalization=b"falcon-placeholder",
++            )
++        ),
++    )
++    register_provider(
++        "sphincs",
++        PlaceholderProvider(
++            AlgorithmSpec(
++                name="sphincs",
++                secret_size=64,
++                public_size=64,
++                signature_size=64,
++                personalization=b"sphincs-placeholder",
++            )
++        ),
++    )
++    register_provider(
++        "dilithium",
++        PlaceholderProvider(
++            AlgorithmSpec(
++                name="dilithium",
++                secret_size=64,
++                public_size=48,
++                signature_size=48,
++                personalization=b"dilithium-placeholder",
++            )
++        ),
++    )
++
++
++def _register_oqs_providers() -> None:  # pragma: no cover - optional dependency
++    try:
++        import oqs
++    except ImportError:  # pragma: no cover - executed when oqs missing
++        return
++
++    class OQSProvider:
++        def __init__(self, scheme: str, algorithm: str):
++            self.scheme = scheme
++            self.algorithm = algorithm
++            with oqs.Signature(algorithm) as signature:
++                details = signature.details
++                self.spec = AlgorithmSpec(
++                    name=scheme,
++                    secret_size=details.length_secret_key,
++                    public_size=details.length_public_key,
++                    signature_size=details.length_signature,
++                    personalization=algorithm.encode("ascii", "ignore"),
++                )
++
++        def generate_keypair(self, seed: Optional[bytes]) -> PQKeyPair:
++            if seed is not None:
++                raise ValueError("Deterministic key generation is not supported by the OQS backend")
++            with oqs.Signature(self.algorithm) as signature:
++                public_key, secret_key = signature.generate_keypair()
++            return PQKeyPair(scheme=self.scheme, public_key=public_key, secret_key=secret_key)
++
++        def sign(self, message: bytes, keypair: PQKeyPair) -> bytes:
++            if keypair.scheme.lower() != self.scheme:
++                raise InvalidSignatureError(
++                    f"Key pair scheme mismatch: expected {self.scheme}, received {keypair.scheme}"
++                )
++            with oqs.Signature(self.algorithm) as signature:
++                return signature.sign(message, keypair.secret_key)
++
++        def verify(self, message: bytes, signature_value: bytes, public_key: bytes) -> bool:
++            with oqs.Signature(self.algorithm) as signature:
++                return signature.verify(message, signature_value, public_key)
++
++    oqs_algorithms = {
++        "falcon": "Falcon-1024",
++        "sphincs": "SPHINCS+-SHA2-128s-simple",
++        "dilithium": "Dilithium3",
++    }
++    for scheme, algorithm in oqs_algorithms.items():
++        try:
++            register_provider(scheme, OQSProvider(scheme, algorithm), override=True)
++        except Exception:
++            # Falling back to the placeholder provider keeps the module usable
++            # even when an individual OQS algorithm fails to initialise.
++            continue
++
++
++_register_default_placeholders()
++_register_oqs_providers()
++
++
++def generate_keypair(scheme: str, seed: Optional[bytes] = None) -> PQKeyPair:
++    """Generate a key pair for ``scheme`` using the active provider.
++
++    The placeholder providers support deterministic output when ``seed`` is
++    given which keeps unit tests reproducible.  Real providers (for example the
++    optional OQS backend) may raise :class:`InvalidSignatureError` when seeding
++    is not supported.
++    """
++
++    provider = _get_provider(scheme)
++    try:
++        return provider.generate_keypair(seed)
++    except ValueError as exc:
++        raise InvalidSignatureError(str(exc)) from exc
++
++
++def sign_message(message: bytes, keypair: PQKeyPair) -> bytes:
++    """Return a signature for ``message`` using ``keypair``.
++
++    The concrete behaviour depends on the active provider.  Placeholder
++    providers emit deterministic digests while real providers delegate to the
++    underlying cryptographic library.
++    """
++
++    provider = _get_provider(keypair.scheme)
++    return provider.sign(message, keypair)
++
++
++def verify_message(message: bytes, signature: bytes, scheme: str, public_key: bytes) -> bool:
++    """Validate ``signature`` for ``message`` using ``scheme`` and ``public_key``."""
++
++    provider = _get_provider(scheme)
++    return provider.verify(message, signature, public_key)
++
++
++def sign_frame(payload: bytes, keypair: PQKeyPair) -> bytes:
++    """Serialize ``payload`` alongside a signature and scheme marker.
++
++    The frame is a JSON blob containing base64 encoded payload and signature.
++    The structure keeps the implementation self-contained and is easy to
++    integrate with shell tooling, mirroring the user's request for concise
++    plumbing.
++    """
++
++    signature = sign_message(payload, keypair)
++    frame = {
++        "scheme": keypair.scheme,
++        "payload": base64.b64encode(payload).decode("ascii"),
++        "signature": base64.b64encode(signature).decode("ascii"),
++    }
++    return json.dumps(frame, separators=(",", ":")).encode("utf-8")
++
++
++def verify_frame(frame: bytes, public_key: bytes) -> Tuple[bytes, str]:
++    """Validate a serialized frame and return the payload and scheme.
++
++    Raises :class:`FrameFormatError` on JSON parsing issues and
++    :class:`InvalidSignatureError` if the signature check fails.
++    """
++
++    try:
++        document = json.loads(frame.decode("utf-8"))
++        scheme = document["scheme"]
++        payload_b64 = document["payload"]
++        signature_b64 = document["signature"]
++    except (UnicodeDecodeError, KeyError, json.JSONDecodeError) as exc:
++        raise FrameFormatError("Could not decode signature frame") from exc
++
++    payload = base64.b64decode(payload_b64)
++    signature = base64.b64decode(signature_b64)
++    if not verify_message(payload, signature, scheme=scheme, public_key=public_key):
++        raise InvalidSignatureError("Signature check failed")
++    return payload, scheme
+diff --git a/extra/pqxhybrid/cli.py b/extra/pqxhybrid/cli.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..065c97dc7dba4bda7f28acf23969d0f38ccd1add
+--- /dev/null
++++ b/extra/pqxhybrid/cli.py
+@@ -0,0 +1,107 @@
++"""Minimal command line interface for the placeholder PQ hybrid helpers."""
++
++from __future__ import annotations
++
++import argparse
++import base64
++import sys
++from pathlib import Path
++from typing import Optional
++
++from . import (
++    FrameFormatError,
++    InvalidSignatureError,
++    PQKeyPair,
++    UnsupportedSchemeError,
++    available_schemes,
++    generate_keypair,
++    sign_frame,
++    verify_frame,
++)
++
++
++def _load_bytes(value: str, *, is_path: bool = False) -> bytes:
++    if is_path:
++        return Path(value).read_bytes()
++    return value.encode("utf-8")
++
++
++def _decode_key(value: str) -> bytes:
++    try:
++        return base64.b64decode(value)
++    except Exception as exc:  # pragma: no cover - defensive guard
++        raise argparse.ArgumentTypeError("Key material must be valid base64") from exc
++
++
++def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
++    parser = argparse.ArgumentParser(description=__doc__)
++    subparsers = parser.add_subparsers(dest="command", required=True)
++
++    schemes = available_schemes()
++
++    keygen = subparsers.add_parser("keygen", help="Generate a deterministic key pair")
++    keygen.add_argument("scheme", choices=schemes)
++    keygen.add_argument("--seed", help="Hexadecimal seed used for deterministic output")
++
++    sign_cmd = subparsers.add_parser("sign", help="Sign a payload and emit a frame")
++    sign_cmd.add_argument("scheme", choices=schemes)
++    sign_cmd.add_argument("public_key", type=_decode_key)
++    sign_cmd.add_argument("secret_key", type=_decode_key)
++    sign_cmd.add_argument("payload")
++    sign_cmd.add_argument("--payload-from", choices=("text", "file"), default="text")
++
++    verify_cmd = subparsers.add_parser("verify", help="Verify a serialized frame")
++    verify_cmd.add_argument("public_key", type=_decode_key)
++    verify_cmd.add_argument("frame")
++    verify_cmd.add_argument("--frame-from", choices=("text", "file"), default="text")
++
++    return parser.parse_args(argv)
++
++
++def cmd_keygen(namespace: argparse.Namespace) -> int:
++    seed = bytes.fromhex(namespace.seed) if namespace.seed else None
++    pair = generate_keypair(namespace.scheme, seed=seed)
++    scheme, public_b64, secret_b64 = pair.encode()
++    print(scheme)
++    print(public_b64)
++    print(secret_b64)
++    return 0
++
++
++def cmd_sign(namespace: argparse.Namespace) -> int:
++    payload = _load_bytes(namespace.payload, is_path=namespace.payload_from == "file")
++    pair = PQKeyPair(namespace.scheme, namespace.public_key, namespace.secret_key)
++    try:
++        frame = sign_frame(payload, pair)
++    except InvalidSignatureError as exc:
++        print(f"error: {exc}", file=sys.stderr)
++        return 1
++    sys.stdout.buffer.write(frame + b"\n")
++    return 0
++
++
++def cmd_verify(namespace: argparse.Namespace) -> int:
++    frame = _load_bytes(namespace.frame, is_path=namespace.frame_from == "file")
++    try:
++        payload, scheme = verify_frame(frame, namespace.public_key)
++    except (FrameFormatError, InvalidSignatureError, UnsupportedSchemeError) as exc:
++        print(f"error: {exc}", file=sys.stderr)
++        return 1
++    print(scheme)
++    sys.stdout.buffer.write(payload + b"\n")
++    return 0
++
++
++def main(argv: Optional[list[str]] = None) -> int:
++    namespace = _parse_args(argv)
++    if namespace.command == "keygen":
++        return cmd_keygen(namespace)
++    if namespace.command == "sign":
++        return cmd_sign(namespace)
++    if namespace.command == "verify":
++        return cmd_verify(namespace)
++    raise RuntimeError(f"Unhandled command: {namespace.command}")  # pragma: no cover
++
++
++if __name__ == "__main__":  # pragma: no cover
++    raise SystemExit(main())
+diff --git a/test/conftest.py b/test/conftest.py
+index 845914f7bdf52557e104db01d0561fbda739ad2f..c202dca77d874c4a221428d9c696bb962121cdb8 100644
+--- a/test/conftest.py
++++ b/test/conftest.py
+@@ -1,34 +1,46 @@
+ import os
+ import sys
+ from contextlib import ExitStack
+ from unittest import mock
+ 
+ import pytest
+ 
+ # Ensure the project root is on sys.path so that the GramAddict package can be imported
+ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ if PROJECT_ROOT not in sys.path:
+     sys.path.insert(0, PROJECT_ROOT)
+ 
+ 
++@pytest.fixture(scope="session", autouse=True)
++def project_root_working_directory():
++    """Ensure tests run from the project root so relative fixtures resolve."""
++
++    previous_cwd = os.getcwd()
++    os.chdir(PROJECT_ROOT)
++    try:
++        yield
++    finally:
++        os.chdir(previous_cwd)
++
++
+ @pytest.fixture
+ def mocker():
+     """A lightweight substitute for pytest-mock's mocker fixture."""
+ 
+     class SimpleMocker:
+         def __init__(self):
+             self._exit_stack = ExitStack()
+ 
+         def patch(self, target, *args, **kwargs):
+             patcher = mock.patch(target, *args, **kwargs)
+             mocked = self._exit_stack.enter_context(patcher)
+             return mocked
+ 
+         def stop(self):
+             self._exit_stack.close()
+ 
+     instance = SimpleMocker()
+     try:
+         yield instance
+     finally:
+         instance.stop()
+diff --git a/test/test_cerber_bundler.py b/test/test_cerber_bundler.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..3eb5de5cc0bf4817601a5bae5469fdcda73768df
+--- /dev/null
++++ b/test/test_cerber_bundler.py
+@@ -0,0 +1,24 @@
++from pathlib import Path
++
++import tools.cerber_bundler as bundler
++
++
++def test_bundle_docs_creates_output(tmp_path: Path, monkeypatch: None) -> None:
++    out_path = tmp_path / "bundle.md"
++    result = bundler.bundle_docs(output=out_path)
++
++    assert result == out_path
++    content = result.read_text(encoding="utf-8")
++    assert "Cerber Bundle" in content
++    assert "cerber_v7_architecture.md" in content
++    assert "cerber_plug_and_play.md" in content
++
++
++def test_bundle_docs_rejects_missing_input(tmp_path: Path) -> None:
++    missing = tmp_path / "missing.md"
++    try:
++        bundler.bundle_docs(inputs=[missing], output=tmp_path / "out.md")
++    except FileNotFoundError as exc:
++        assert "Missing input files" in str(exc)
++    else:  # pragma: no cover
++        assert False, "Expected FileNotFoundError"
+diff --git a/test/test_living_code_engine.py b/test/test_living_code_engine.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..ce37967ac74773ae5c3a8f860f3fdaee7d7d3b68
+--- /dev/null
++++ b/test/test_living_code_engine.py
+@@ -0,0 +1,90 @@
++from __future__ import annotations
++
++import importlib.util
++import json
++from pathlib import Path
++
++import pytest
++
++from tools.living_code_engine import LivingCodeEngine, TelemetryEvent
++
++
++def _load_module(path: Path):
++    spec = importlib.util.spec_from_file_location("cerber_living_rules", path)
++    module = importlib.util.module_from_spec(spec)
++    assert spec and spec.loader
++    spec.loader.exec_module(module)  # type: ignore[call-arg]
++    return module
++
++
++def test_engine_writes_new_rules_and_is_importable(tmp_path: Path) -> None:
++    engine = LivingCodeEngine(base_dir=tmp_path)
++    events = [
++        TelemetryEvent(0.1, 1, 0, 0, label="benign"),
++        TelemetryEvent(0.2, 2, 0, 1, label="benign"),
++        TelemetryEvent(0.92, 6, 2, 3, label="malicious"),
++    ]
++
++    module_path = engine.update_rules(events)
++    assert module_path.exists()
++
++    generated = _load_module(module_path)
++    assert generated.VERSION == 1
++    assert generated.decide_action(
++        {"anomaly_score": 0.95, "novel_processes": 8, "privilege_escalations": 3, "network_beacons": 4}
++    )
++    assert generated.decide_action(
++        {"anomaly_score": 0.0, "novel_processes": 0, "privilege_escalations": 0, "network_beacons": 0}
++    ) == "observe"
++
++
++def test_engine_accumulates_history_and_bumps_versions(tmp_path: Path) -> None:
++    engine = LivingCodeEngine(base_dir=tmp_path)
++    initial = [TelemetryEvent(0.15, 2, 0, 0, label="benign")]
++    follow_up = [TelemetryEvent(0.85, 7, 2, 4, label="malicious")]
++
++    first_path = engine.update_rules(initial)
++    first_module = _load_module(first_path)
++
++    second_path = engine.update_rules(follow_up)
++    second_module = _load_module(second_path)
++
++    assert second_module.VERSION == first_module.VERSION + 1
++    assert second_module.GENERATED_AT != first_module.GENERATED_AT
++    assert engine.history_path.exists()
++    history_lines = engine.history_path.read_text().splitlines()
++    assert len(history_lines) == len(initial) + len(follow_up)
++
++    suspicious_score = second_module.score_event(
++        {"anomaly_score": 0.9, "novel_processes": 10, "privilege_escalations": 3, "network_beacons": 5}
++    )
++    assert suspicious_score >= 0.5
++
++
++def test_engine_requires_events(tmp_path: Path) -> None:
++    engine = LivingCodeEngine(base_dir=tmp_path)
++    with pytest.raises(ValueError):
++        engine.update_rules([])
++
++
++def test_engine_masks_and_self_heals(tmp_path: Path) -> None:
++    engine = LivingCodeEngine(base_dir=tmp_path)
++    events = [
++        TelemetryEvent(0.25, 3, 0, 1, label="benign"),
++        TelemetryEvent(0.93, 8, 2, 5, label="malicious"),
++    ]
++
++    module_path = engine.update_rules(events)
++    manifest = json.loads(engine.manifest_path.read_text())
++
++    assert engine.manifest_path.exists()
++    assert "current" in manifest
++    masked_path = Path(manifest["current"]["masked_path"])
++    assert masked_path.exists()
++
++    original = module_path.read_text()
++    module_path.unlink()
++
++    healed_path = engine.self_heal()
++    assert healed_path == module_path
++    assert healed_path.read_text() == original
+diff --git a/test/test_plug_and_play_tools.py b/test/test_plug_and_play_tools.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..1b0d387b1ac7c84cffa082ef35054a668a7f190e
+--- /dev/null
++++ b/test/test_plug_and_play_tools.py
+@@ -0,0 +1,50 @@
++import json
++import socket
++import subprocess
++from pathlib import Path
++
++from tools import guardian_probe, lasuch_honeypot, white_noise
++
++
++def _completed(stdout: str) -> subprocess.CompletedProcess[str]:
++    return subprocess.CompletedProcess(args=["echo"], returncode=0, stdout=stdout, stderr="")
++
++
++def test_guardian_capture_creates_outputs(tmp_path):
++    def runner(cmd):
++        marker = "process" if "ps" in cmd[0] or "tasklist" in cmd[0] else "network"
++        return _completed(f"{marker}\n")
++
++    out_dir = guardian_probe.capture_guardian_report(base_dir=tmp_path, runner=runner)
++    assert (out_dir / "processes.txt").read_text() == "process\n"
++    assert (out_dir / "network.txt").read_text() == "network\n"
++
++
++def test_lasuch_evidence_writer(tmp_path):
++    writer = lasuch_honeypot.EvidenceWriter(tmp_path)
++    saved = writer.write("127.0.0.1:9000", b"hello")
++    payload = json.loads(saved.read_text())
++    assert payload["peer"] == "127.0.0.1:9000"
++    assert payload["bytes"] == 5
++    assert payload["payload_b64"] == "hello"
++
++
++def test_lasuch_honeypot_roundtrip(tmp_path):
++    server = lasuch_honeypot.run_honeypot("127.0.0.1", 0, base_dir=tmp_path)
++    host, port = server.server_address
++    with socket.create_connection((host, port)) as sock:
++        sock.sendall(b"ping")
++        response = sock.recv(1024)
++    server.shutdown()
++    assert response.decode().startswith("captured:")
++    evidence_files = list(tmp_path.glob("capture_*.json"))
++    assert evidence_files, "expected honeypot evidence"
++
++
++def test_white_noise_emits_lines(tmp_path):
++    dest = tmp_path / "noise.log"
++    white_noise.emit_noise(count=3, destination=dest, width=8)
++    assert dest.exists()
++    lines = dest.read_text().splitlines()
++    assert len(lines) == 3
++    assert all(len(line.split(" ")[-1]) == 8 for line in lines)
+diff --git a/test/test_pqxhybrid.py b/test/test_pqxhybrid.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..d89d624efeb23b3a11c59d381c0b5461af2af610
+--- /dev/null
++++ b/test/test_pqxhybrid.py
+@@ -0,0 +1,136 @@
++import base64
++import json
++
++import pytest
++
++from extra.pqxhybrid import (
++    AlgorithmSpec,
++    FrameFormatError,
++    InvalidSignatureError,
++    PQKeyPair,
++    UnsupportedSchemeError,
++    available_schemes,
++    generate_keypair,
++    register_provider,
++    sign_frame,
++    sign_message,
++    unregister_provider,
++    verify_frame,
++    verify_message,
++)
++
++
++@pytest.mark.parametrize("scheme", ["falcon", "sphincs", "dilithium"])
++def test_generate_keypair_deterministic(scheme: str) -> None:
++    seed = b"seed-" + scheme.encode("ascii")
++    pair1 = generate_keypair(scheme, seed=seed)
++    pair2 = generate_keypair(scheme, seed=seed)
++    assert pair1 == pair2
++
++
++@pytest.mark.parametrize("scheme", ["falcon", "sphincs", "dilithium"])
++def test_sign_and_verify_round_trip(scheme: str) -> None:
++    pair = generate_keypair(scheme, seed=b"demo-seed-" + scheme.encode("ascii"))
++    message = f"payload-{scheme}".encode("utf-8")
++    signature = sign_message(message, pair)
++    assert verify_message(message, signature, scheme, pair.public_key)
++
++
++@pytest.mark.parametrize("scheme", ["falcon", "sphincs", "dilithium"])
++def test_sign_frame_and_verify_round_trip(scheme: str) -> None:
++    pair = generate_keypair(scheme, seed=b"frame-" + scheme.encode("ascii"))
++    payload = f"frame-data-{scheme}".encode("utf-8")
++    frame = sign_frame(payload, pair)
++    decoded_payload, decoded_scheme = verify_frame(frame, pair.public_key)
++    assert decoded_payload == payload
++    assert decoded_scheme == scheme
++
++
++def test_sign_frame_detects_tampering() -> None:
++    pair = generate_keypair("falcon", seed=b"falcon-seed")
++    frame = sign_frame(b"payload", pair)
++    document = json.loads(frame)
++    document["payload"] = base64.b64encode(b"evil").decode("ascii")
++    tampered = json.dumps(document).encode("utf-8")
++    with pytest.raises(InvalidSignatureError):
++        verify_frame(tampered, pair.public_key)
++
++
++def test_frame_format_error() -> None:
++    pair = generate_keypair("sphincs", seed=b"format-seed")
++    frame = sign_frame(b"payload", pair)
++    broken = frame.replace(b"\"scheme\"", b"\"missing\"")
++    with pytest.raises(FrameFormatError):
++        verify_frame(broken, pair.public_key)
++
++
++def test_sign_message_rejects_mismatched_keys() -> None:
++    pair = generate_keypair("falcon", seed=b"a" * 16)
++    wrong = PQKeyPair(scheme="falcon", public_key=pair.public_key, secret_key=b"0" * len(pair.secret_key))
++    with pytest.raises(InvalidSignatureError):
++        sign_message(b"payload", wrong)
++
++
++def test_verify_message_with_wrong_scheme() -> None:
++    pair = generate_keypair("falcon", seed=b"falcon")
++    signature = sign_message(b"hello", pair)
++    with pytest.raises(UnsupportedSchemeError):
++        verify_message(b"hello", signature, scheme="unknown", public_key=pair.public_key)
++def test_available_schemes_contains_placeholders() -> None:
++    assert {"falcon", "sphincs", "dilithium"}.issubset(set(available_schemes()))
++
++
++class _DemoProvider:
++    def __init__(self, scheme: str = "demo") -> None:
++        self.scheme = scheme
++        self.spec = AlgorithmSpec(
++            name=scheme,
++            secret_size=8,
++            public_size=8,
++            signature_size=8,
++            personalization=b"demo",
++        )
++
++    def generate_keypair(self, seed: bytes | None) -> PQKeyPair:
++        if seed is None:
++            seed = b"demo-seed"
++        expanded = (seed * (self.spec.secret_size // len(seed) + 1))[: self.spec.secret_size]
++        secret = expanded
++        public = expanded[::-1]
++        return PQKeyPair(self.scheme, public, secret)
++
++    def sign(self, message: bytes, keypair: PQKeyPair) -> bytes:
++        if keypair.scheme != self.scheme:
++            raise InvalidSignatureError("Scheme mismatch for demo provider")
++        digest = (keypair.public_key + message)[: self.spec.signature_size]
++        return digest.ljust(self.spec.signature_size, b"\0")
++
++    def verify(self, message: bytes, signature: bytes, public_key: bytes) -> bool:
++        expected = (public_key + message)[: self.spec.signature_size].ljust(self.spec.signature_size, b"\0")
++        return signature == expected
++
++
++def test_register_custom_provider_round_trip() -> None:
++    provider = _DemoProvider()
++    register_provider(provider.scheme, provider)
++    try:
++        pair = generate_keypair(provider.scheme, seed=b"seed")
++        signature = sign_message(b"payload", pair)
++        assert verify_message(b"payload", signature, provider.scheme, pair.public_key)
++    finally:
++        unregister_provider(provider.scheme)
++
++
++def test_register_provider_rejects_duplicates() -> None:
++    provider = _DemoProvider("falcon")
++    with pytest.raises(ValueError):
++        register_provider("falcon", provider)
++
++
++def test_unregister_provider_removes_scheme() -> None:
++    provider = _DemoProvider("temp-scheme")
++    register_provider(provider.scheme, provider)
++    unregister_provider(provider.scheme)
++    with pytest.raises(UnsupportedSchemeError):
++        generate_keypair(provider.scheme)
++
+diff --git a/test/test_telegram.py b/test/test_telegram.py
+index c9d31e28e14409b3e08a1b6fe91238f61a37241e..4f2f6aa33593db48f803594d118e0b383a327ef6 100644
+--- a/test/test_telegram.py
++++ b/test/test_telegram.py
+@@ -1,38 +1,41 @@
+ import json
++from pathlib import Path
+ from unittest.mock import mock_open
+ 
+ import pytest
+ from datetime import datetime
+ 
+ import GramAddict.plugins.telegram as TelegramReports
+ 
+ 
+ @pytest.fixture
+ def mock_session_data_raw():
+     """Provides session data in raw format"""
+-    with open(r"mock_data\sessions.json", "r") as file:
++
++    test_dir = Path(__file__).parent
++    with open(test_dir / "mock_data" / "sessions.json", "r", encoding="utf-8") as file:
+         return file.read()
+ 
+ 
+ @pytest.fixture
+ def mock_session_data_json(mock_session_data_raw):
+     """Provides session data in JSON format"""
+     return json.loads(mock_session_data_raw)
+ 
+ 
+ @pytest.fixture
+ def mock_daily_summary():
+     return {
+         "2024-01-02": {
+             "total_likes": 20,
+             "total_watched": 20,
+             "total_followed": 20,
+             "total_unfollowed": 20,
+             "total_comments": 20,
+             "total_pm": 20,
+             "duration": 120,
+             "followers": 120,
+             "following": 120,
+             "followers_gained": 20,
+         },
+         "2024-01-01": {
+diff --git a/tools/__init__.py b/tools/__init__.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/tools/cerber_bundler.py b/tools/cerber_bundler.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..4328d20b8a2af5784cd7f638d85e6b3307392acc
+--- /dev/null
++++ b/tools/cerber_bundler.py
+@@ -0,0 +1,85 @@
++"""Bundle Cerber reference docs into a single handoff file.
++
++This utility concatenates the core Cerber documentation set so operators can
++share a single artifact. By default it bundles the reference architecture and
++plug-and-play guide, but inputs and output can be overridden via CLI flags.
++"""
++
++from __future__ import annotations
++
++import argparse
++from datetime import datetime, timezone
++from pathlib import Path
++from typing import Iterable, List
++
++
++DEFAULT_INPUTS = [
++    Path("docs/cerber_v7_architecture.md"),
++    Path("docs/cerber_plug_and_play.md"),
++]
++
++
++def bundle_docs(inputs: Iterable[Path] | None = None, output: Path | None = None) -> Path:
++    """Concatenate Cerber docs into a single file.
++
++    Args:
++        inputs: Paths to markdown files. Defaults to the architecture and plug-and-play docs.
++        output: Destination path. Defaults to ``docs/cerber_bundle.md``.
++
++    Returns:
++        The path that was written.
++    """
++
++    input_paths: List[Path] = [Path(p) for p in (inputs or DEFAULT_INPUTS)]
++    output_path = output or Path("docs/cerber_bundle.md")
++
++    missing = [str(p) for p in input_paths if not p.exists()]
++    if missing:
++        raise FileNotFoundError(f"Missing input files: {', '.join(missing)}")
++
++    output_path.parent.mkdir(parents=True, exist_ok=True)
++    header = _bundle_header(input_paths)
++
++    with output_path.open("w", encoding="utf-8") as outfile:
++        outfile.write(header)
++        for idx, path in enumerate(input_paths, start=1):
++            outfile.write(f"\n\n<!-- Begin source: {path} (part {idx}/{len(input_paths)}) -->\n\n")
++            outfile.write(path.read_text(encoding="utf-8"))
++            outfile.write(f"\n\n<!-- End source: {path} -->\n")
++
++    return output_path
++
++
++def _bundle_header(inputs: List[Path]) -> str:
++    timestamp = datetime.now(tz=timezone.utc).isoformat()
++    joined = "\n".join(f"- {p}" for p in inputs)
++    return (
++        "# Cerber Bundle\n\n"
++        "Concatenated reference for quick sharing.\n\n"
++        f"Generated: {timestamp}\n\n"
++        "Sources:\n"
++        f"{joined}\n"
++    )
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument(
++        "--inputs",
++        nargs="+",
++        type=Path,
++        help="Paths to markdown files to concatenate (default: Cerber architecture and plug-and-play guides).",
++    )
++    parser.add_argument(
++        "--output",
++        type=Path,
++        default=Path("docs/cerber_bundle.md"),
++        help="Destination path for the bundled markdown (default: docs/cerber_bundle.md).",
++    )
++
++    args = parser.parse_args()
++    bundle_docs(args.inputs, args.output)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/cerber_ingest_stub.py b/tools/cerber_ingest_stub.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..6ab9000b7c5d5ddd4e4fb1828481d8e5ca5a2b21
+--- /dev/null
++++ b/tools/cerber_ingest_stub.py
+@@ -0,0 +1,66 @@
++"""Minimal ingest stub for Cerber plug-and-play exercises.
++
++The handler accepts JSON frames produced by ``extra.pqxhybrid.cli sign`` and
++persists them under ``/tmp/cerber_ingest`` after verifying the signature.
++It intentionally depends only on the Python standard library and the local
++``extra.pqxhybrid`` helpers so it can run from a clean checkout.
++"""
++
++from __future__ import annotations
++
++import base64
++import http.server
++import json
++import pathlib
++from typing import Tuple
++
++from extra import pqxhybrid
++
++OUT = pathlib.Path("/tmp/cerber_ingest")
++OUT.mkdir(parents=True, exist_ok=True)
++
++
++def _decode_frame(raw: bytes) -> Tuple[bytes, str]:
++    frame = json.loads(raw)
++    try:
++        public = base64.b64decode(frame["public_key"])
++        payload = frame["frame"]
++    except KeyError as exc:  # pragma: no cover - defensive guard
++        raise ValueError(f"Missing field: {exc.args[0]}") from exc
++    return public, payload
++
++
++class Handler(http.server.BaseHTTPRequestHandler):
++    def do_POST(self) -> None:  # noqa: N802 - http.server naming contract
++        length = int(self.headers.get("content-length", 0))
++        body = self.rfile.read(length)
++
++        try:
++            public, payload = _decode_frame(body)
++            valid = pqxhybrid.verify_frame(payload, public)
++        except Exception as exc:  # pragma: no cover - small stub
++            self.send_error(400, str(exc))
++            return
++
++        if not valid:
++            self.send_error(400, "invalid signature")
++            return
++
++        OUT.joinpath("frame.json").write_text(body.decode("utf-8"))
++        self.send_response(200)
++        self.end_headers()
++        self.wfile.write(b"ok")
++
++    def log_message(self, format: str, *args) -> None:  # noqa: A003 - base method signature
++        # Silence default logging to keep the stub clean for demos.
++        return
++
++
++def main() -> None:
++    server = http.server.HTTPServer(("0.0.0.0", 8080), Handler)
++    print("[cerber_ingest_stub] listening on http://0.0.0.0:8080")
++    server.serve_forever()
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/guardian_probe.py b/tools/guardian_probe.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..6b995725bc693b9915005c98a177d9c26f1f5939
+--- /dev/null
++++ b/tools/guardian_probe.py
+@@ -0,0 +1,77 @@
++"""Minimal Guardian probe for plug-and-play exercises.
++
++The probe captures lightweight process and network snapshots using only the
++standard library. Outputs are written to a timestamped directory so they can be
++reviewed locally or forwarded to the ingest stub.
++"""
++
++from __future__ import annotations
++
++import platform
++import subprocess
++import time
++from pathlib import Path
++from typing import Callable, Iterable, Sequence
++
++Runner = Callable[[Sequence[str]], subprocess.CompletedProcess[str]]
++
++
++def _default_runner(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
++    return subprocess.run(command, capture_output=True, text=True, check=False)
++
++
++def _choose_process_command() -> Sequence[str]:
++    if platform.system().lower().startswith("win"):
++        return ["tasklist", "/fo", "csv", "/nh"]
++    return ["ps", "-eo", "pid,comm,%cpu,%mem"]
++
++
++def _choose_network_command() -> Sequence[str]:
++    if platform.system().lower().startswith("win"):
++        return ["netstat", "-ano"]
++    return ["netstat", "-an"]
++
++
++def _ensure_output_dir(base: Path | None) -> Path:
++    base_dir = base or Path.home() / ".cerber" / "evidence" / "guardian"
++    timestamp = time.strftime("%Y%m%d_%H%M%S")
++    out_dir = base_dir / timestamp
++    out_dir.mkdir(parents=True, exist_ok=True)
++    return out_dir
++
++
++def capture_guardian_report(
++    *,
++    base_dir: Path | None = None,
++    runner: Runner = _default_runner,
++) -> Path:
++    """Capture process and network snapshots to ``base_dir``.
++
++    Returns the directory containing the report artifacts.
++    """
++
++    out_dir = _ensure_output_dir(base_dir)
++    commands = {
++        "processes.txt": _choose_process_command(),
++        "network.txt": _choose_network_command(),
++    }
++
++    for filename, command in commands.items():
++        result = runner(command)
++        body = result.stdout or result.stderr
++        (out_dir / filename).write_text(body)
++    return out_dir
++
++
++def main(argv: Iterable[str] | None = None) -> int:
++    try:
++        out_dir = capture_guardian_report()
++        print(f"Guardian snapshot written to {out_dir}")
++        return 0
++    except Exception as exc:  # pragma: no cover - defensive guard
++        print(f"Guardian probe failed: {exc}")
++        return 1
++
++
++if __name__ == "__main__":  # pragma: no cover - CLI wrapper
++    raise SystemExit(main())
+diff --git a/tools/lasuch_honeypot.py b/tools/lasuch_honeypot.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..3db818ff1235d18a91f8432188fd491e516796b5
+--- /dev/null
++++ b/tools/lasuch_honeypot.py
+@@ -0,0 +1,76 @@
++"""Lightweight honeypot for the Łasuch plug-and-play track.
++
++The server listens on a TCP port, writes inbound payloads to an evidence
++directory, and then closes the connection. It is intentionally simple so it can
++run in constrained demo environments.
++"""
++
++from __future__ import annotations
++
++import json
++import socketserver
++import threading
++import time
++from pathlib import Path
++from typing import Optional
++
++
++class EvidenceWriter:
++    def __init__(self, base_dir: Optional[Path] = None):
++        self.base_dir = base_dir or Path.home() / ".cerber" / "evidence" / "lasuch"
++        self.base_dir.mkdir(parents=True, exist_ok=True)
++
++    def write(self, peername: str, payload: bytes) -> Path:
++        timestamp = time.strftime("%Y%m%d_%H%M%S")
++        out_file = self.base_dir / f"capture_{timestamp}.json"
++        content = {
++            "peer": peername,
++            "bytes": len(payload),
++            "payload_b64": payload.decode("latin-1"),
++        }
++        out_file.write_text(json.dumps(content, indent=2))
++        return out_file
++
++
++class _Handler(socketserver.BaseRequestHandler):
++    writer: EvidenceWriter
++
++    def handle(self) -> None:  # pragma: no cover - exercised via integration test
++        data = self.request.recv(4096)
++        peer = f"{self.client_address[0]}:{self.client_address[1]}"
++        saved = self.writer.write(peer, data)
++        self.request.sendall(f"captured:{saved.name}".encode())
++
++
++class HoneypotServer(socketserver.ThreadingTCPServer):
++    allow_reuse_address = True
++
++    def __init__(self, server_address, writer: EvidenceWriter, **kwargs):
++        super().__init__(server_address, _Handler, **kwargs)
++        _Handler.writer = writer
++
++    def start_in_thread(self) -> threading.Thread:
++        thread = threading.Thread(target=self.serve_forever, daemon=True)
++        thread.start()
++        return thread
++
++
++def run_honeypot(host: str = "0.0.0.0", port: int = 4040, base_dir: Optional[Path] = None) -> HoneypotServer:
++    writer = EvidenceWriter(base_dir)
++    server = HoneypotServer((host, port), writer)
++    server.start_in_thread()
++    return server
++
++
++def main() -> int:  # pragma: no cover - small CLI
++    server = run_honeypot()
++    print(f"Łasuch honeypot listening on {server.server_address}")
++    try:
++        server.serve_forever()
++    except KeyboardInterrupt:
++        server.shutdown()
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/living_code_engine.py b/tools/living_code_engine.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..5af2bacb222f99a156abfdd9e8d7d086807d905b
+--- /dev/null
++++ b/tools/living_code_engine.py
+@@ -0,0 +1,251 @@
++"""Living code engine that retrains heuristics and rewrites its own rule module.
++
++The engine ingests lightweight telemetry, computes refreshed thresholds, and
++emits an auto-generated Python module that downstream probes can import. Each
++run bumps the version counter and rewrites the module so Cerber's decision logic
++stays aligned with the latest observations.
++"""
++
++from __future__ import annotations
++
++import hashlib
++import json
++import secrets
++import statistics
++from dataclasses import dataclass, asdict
++from datetime import datetime, timezone
++from pathlib import Path
++from typing import Iterable, List, Sequence
++
++
++@dataclass(frozen=True)
++class TelemetryEvent:
++    """Minimal telemetry sample used to train the living rules."""
++
++    anomaly_score: float
++    novel_processes: int
++    privilege_escalations: int
++    network_beacons: int
++    label: str = "benign"
++
++    def to_payload(self) -> dict:
++        return asdict(self)
++
++
++class LivingCodeEngine:
++    """Updates decision rules from telemetry and rewrites the rule source file."""
++
++    def __init__(self, base_dir: Path | None = None):
++        self.base_dir = base_dir or Path.home() / ".cerber" / "living_code"
++        self.base_dir.mkdir(parents=True, exist_ok=True)
++        self.state_path = self.base_dir / "state.json"
++        self.history_path = self.base_dir / "telemetry.jsonl"
++        self.module_path = self.base_dir / "living_rules.py"
++        self.mask_dir = self.base_dir / "masked"
++        self.mask_dir.mkdir(parents=True, exist_ok=True)
++        self.manifest_path = self.base_dir / "mask_manifest.json"
++
++    def update_rules(self, events: Iterable[TelemetryEvent]) -> Path:
++        samples = list(events)
++        if not samples:
++            raise ValueError("At least one telemetry event is required to retrain rules")
++
++        state = self._load_state()
++        state["version"] = state.get("version", 0) + 1
++        state["updated_at"] = datetime.now(tz=timezone.utc).isoformat()
++        self._append_history(samples)
++
++        history = self._load_history()
++        thresholds = self._derive_thresholds(history)
++        weights = self._derive_weights(history)
++        module_bytes = self._write_module(thresholds, weights, state)
++        mask_info = self._mask_module(module_bytes, state["version"])
++        self._persist_manifest(mask_info)
++        self._persist_state(state)
++        return self.module_path
++
++    def self_heal(self) -> Path:
++        manifest = self._load_manifest()
++        current = manifest.get("current")
++        if not current:
++            raise FileNotFoundError("Mask manifest missing current entry")
++
++        expected_hash = current["hash"]
++        if self.module_path.exists() and self._hash_bytes(self.module_path.read_bytes()) == expected_hash:
++            return self.module_path
++
++        masked_path = Path(current["masked_path"])
++        if masked_path.exists():
++            masked_bytes = masked_path.read_bytes()
++            if self._hash_bytes(masked_bytes) != expected_hash:
++                raise FileNotFoundError("Masked copy checksum mismatch; cannot heal")
++            self.module_path.write_bytes(masked_bytes)
++            return self.module_path
++
++        raise FileNotFoundError("No valid module copy available to heal from")
++
++    def _load_state(self) -> dict:
++        if self.state_path.exists():
++            return json.loads(self.state_path.read_text())
++        return {"version": 0, "updated_at": None}
++
++    def _persist_state(self, state: dict) -> None:
++        self.state_path.write_text(json.dumps(state, indent=2))
++
++    def _append_history(self, samples: Sequence[TelemetryEvent]) -> None:
++        with self.history_path.open("a", encoding="utf-8") as handle:
++            for event in samples:
++                handle.write(json.dumps(event.to_payload()) + "\n")
++
++    def _load_history(self) -> List[TelemetryEvent]:
++        if not self.history_path.exists():
++            return []
++        events: List[TelemetryEvent] = []
++        for line in self.history_path.read_text().splitlines():
++            payload = json.loads(line)
++            events.append(TelemetryEvent(**payload))
++        return events
++
++    def _persist_manifest(self, current: dict) -> None:
++        manifest = {"current": current, "history": []}
++        if self.manifest_path.exists():
++            existing = json.loads(self.manifest_path.read_text())
++            history = existing.get("history", [])
++            if existing.get("current"):
++                history.append(existing["current"])
++            manifest["history"] = history
++        self.manifest_path.write_text(json.dumps(manifest, indent=2))
++
++    def _load_manifest(self) -> dict:
++        if self.manifest_path.exists():
++            return json.loads(self.manifest_path.read_text())
++        return {}
++
++    def _derive_thresholds(self, events: Sequence[TelemetryEvent]) -> dict:
++        benign = [e for e in events if e.label == "benign"]
++        malicious = [e for e in events if e.label != "benign"]
++
++        def _average(values: Sequence[float], default: float) -> float:
++            return statistics.mean(values) if values else default
++
++        def _midpoint(a: float, b: float) -> float:
++            return (a + b) / 2 if b is not None else a
++
++        benign_defaults = {
++            "anomaly_score": 0.15,
++            "novel_processes": 2.0,
++            "privilege_escalations": 0.2,
++            "network_beacons": 1.0,
++        }
++
++        malicious_defaults = {
++            "anomaly_score": 0.8,
++            "novel_processes": 6.0,
++            "privilege_escalations": 2.0,
++            "network_beacons": 4.0,
++        }
++
++        thresholds = {}
++        for field in benign_defaults:
++            benign_avg = _average([getattr(e, field) for e in benign], benign_defaults[field])
++            malicious_avg = _average(
++                [getattr(e, field) for e in malicious], malicious_defaults[field]
++            )
++            thresholds[field] = round(_midpoint(benign_avg, malicious_avg), 3)
++        return thresholds
++
++    def _derive_weights(self, events: Sequence[TelemetryEvent]) -> dict:
++        malicious_count = len([e for e in events if e.label != "benign"])
++        benign_count = len(events) - malicious_count
++        total = max(malicious_count + benign_count, 1)
++        # Bias weights slightly toward malicious-heavy datasets so rare spikes are prioritized.
++        base_weight = 0.25
++        anomaly_weight = base_weight + (malicious_count / total) * 0.25
++        return {
++            "anomaly_score": round(min(anomaly_weight, 0.6), 3),
++            "novel_processes": 0.25,
++            "privilege_escalations": 0.25,
++            "network_beacons": 0.25,
++        }
++
++    def _write_module(self, thresholds: dict, weights: dict, state: dict) -> bytes:
++        generated_at = state["updated_at"]
++        version = state["version"]
++        module = f'''"""AUTO-GENERATED Cerber living rules.
++
++Version: {version}
++Generated: {generated_at}
++DO NOT EDIT BY HAND – this file is rewritten by ``LivingCodeEngine``.
++"""
++
++from __future__ import annotations
++
++VERSION = {version}
++GENERATED_AT = "{generated_at}"
++
++THRESHOLDS = {json.dumps(thresholds, indent=4)}
++WEIGHTS = {json.dumps(weights, indent=4)}
++
++
++def score_event(event: dict) -> float:
++    """Compute a suspicion score between 0 and 1 for a single event."""
++
++    anomaly = float(event.get("anomaly_score", 0.0))
++    novel = float(event.get("novel_processes", 0.0))
++    escalations = float(event.get("privilege_escalations", 0.0))
++    beacons = float(event.get("network_beacons", 0.0))
++
++    score = 0.0
++    score += WEIGHTS["anomaly_score"] if anomaly >= THRESHOLDS["anomaly_score"] else 0.0
++    score += WEIGHTS["novel_processes"] if novel >= THRESHOLDS["novel_processes"] else 0.0
++    score += WEIGHTS["privilege_escalations"] if escalations >= THRESHOLDS["privilege_escalations"] else 0.0
++    score += WEIGHTS["network_beacons"] if beacons >= THRESHOLDS["network_beacons"] else 0.0
++    return min(score, 1.0)
++
++
++def decide_action(event: dict) -> str:
++    """Translate a score into a guardian action."""
++
++    score = score_event(event)
++    if score >= 0.75:
++        return "block"
++    if score >= 0.5:
++        return "quarantine"
++    return "observe"
++        '''
++        module += "\n"
++        module_bytes = module.encode("utf-8")
++        self.module_path.write_bytes(module_bytes)
++        return module_bytes
++
++    def _hash_bytes(self, payload: bytes) -> str:
++        return hashlib.sha256(payload).hexdigest()
++
++    def _mask_module(self, module_bytes: bytes, version: int) -> dict:
++        digest = self._hash_bytes(module_bytes)
++        masked_name = f"{digest[:12]}_{secrets.token_hex(4)}.py"
++        masked_path = self.mask_dir / masked_name
++        masked_path.write_bytes(module_bytes)
++        return {
++            "version": version,
++            "hash": digest,
++            "module_path": str(self.module_path),
++            "masked_path": str(masked_path),
++            "written_at": datetime.now(tz=timezone.utc).isoformat(),
++        }
++
++
++def main() -> int:  # pragma: no cover - small CLI wrapper
++    examples = [
++        TelemetryEvent(0.1, 1, 0, 0, label="benign"),
++        TelemetryEvent(0.2, 2, 0, 1, label="benign"),
++        TelemetryEvent(0.9, 5, 2, 3, label="malicious"),
++    ]
++    engine = LivingCodeEngine()
++    module_path = engine.update_rules(examples)
++    print(f"Refreshed living rules at {module_path}")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/white_noise.py b/tools/white_noise.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..4c0f0e2656044a5ca7c0ec05cd8229d42ae77eec
+--- /dev/null
++++ b/tools/white_noise.py
+@@ -0,0 +1,41 @@
++"""Emit benign noise artifacts for anti-forensic drills."""
++
++from __future__ import annotations
++
++import random
++import string
++import time
++from pathlib import Path
++from typing import Iterable, Optional
++
++
++def _random_line(width: int = 64) -> str:
++    alphabet = string.ascii_letters + string.digits
++    body = "".join(random.choice(alphabet) for _ in range(width))
++    return f"{time.strftime('%Y-%m-%dT%H:%M:%S')} {body}\n"
++
++
++def emit_noise(
++    *,
++    count: int = 50,
++    destination: Optional[Path] = None,
++    width: int = 64,
++) -> Path:
++    """Write ``count`` random lines to ``destination`` (default: user cache)."""
++
++    dest = destination or Path.home() / ".cerber" / "noise.log"
++    dest.parent.mkdir(parents=True, exist_ok=True)
++    with dest.open("a", encoding="utf-8") as handle:
++        for _ in range(count):
++            handle.write(_random_line(width))
++    return dest
++
++
++def main(argv: Iterable[str] | None = None) -> int:  # pragma: no cover - tiny CLI
++    dest = emit_noise()
++    print(f"Noise emitted to {dest}")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

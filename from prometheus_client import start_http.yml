@@ -1,0 +1,59 @@
+from prometheus_client import start_http_server, Counter, Gauge
+import time
+
+# Definicje metryk
+RETRAIN_RUNS = Counter('cerber_ai_retrain_runs_total', 'Całkowita liczba uruchomień retreningu modeli')
+RETRAIN_SUCCESSES = Counter('cerber_ai_retrain_successes_total', 'Liczba udanych retreningów')
+RETRAIN_ERRORS = Counter('cerber_ai_retrain_errors_total', 'Liczba błędów podczas retreningu')
+RETRAIN_DURATION = Gauge('cerber_ai_retrain_duration_seconds', 'Czas trwania retreningu w sekundach')
+
+def run_pipeline():
+    RETRAIN_RUNS.inc()
+    start_time = time.time()
+    try:
+        # ...logika retreningu...
+        RETRAIN_SUCCESSES.inc()
+    except Exception as e:
+        RETRAIN_ERRORS.inc()
+    finally:
+        RETRAIN_DURATION.set(time.time() - start_time)
+
+def run_comprehensive_diagnostic(self, ...):
+    OLLAMA_DIAG_RUNS.inc()
+    start_time = time.time()
+    try:
+        # ...diagnostyka...
+    except Exception as e:
+        OLLAMA_DIAG_ERRORS.inc()
+    finally:
+        OLLAMA_DIAG_DURATION.set(time.time() - start_time)
+
+if __name__ == "__main__":
+    start_http_server(8000)
+    run_pipeline()
+
+scrape_configs:
+  - job_name: 'cerber-ai-retrain'
+    static_configs:
+      - targets: ['cerber-ai-retrain:8000']
+
+groups:
+- name: cerber_ai_retrain_alerts
+  rules:
+  - alert: RetrainProcessFailed
+    expr: cerber_ai_retrain_errors_total > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Błąd procesu retreningu Cerber AI"
+      description: "Wystąpił błąd podczas ostatniego uruchomienia retreningu modeli."
+
+  - alert: RetrainProcessTooLong
+    expr: cerber_ai_retrain_duration_seconds > 600
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Długi czas trwania retreningu"
+      description: "Proces retreningu trwa ponad 10 minut, co może wskazywać na problem."

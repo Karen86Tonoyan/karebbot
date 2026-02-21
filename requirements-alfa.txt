@@ -1,0 +1,112 @@
+# ALFA SYSTEM - Requirements
+# Core dependencies for ALFA SYSTEM v1.0.0
+
+# ═══════════════════════════════════════════════════════════
+# CORE DEPENDENCIES
+# ═══════════════════════════════════════════════════════════
+
+# Async HTTP client for AI APIs
+aiohttp>=3.9.0
+
+# System monitoring
+psutil>=5.9.0
+
+# ═══════════════════════════════════════════════════════════
+# MAIL MODULE (IMAP + SMTP + Crypto)
+# ═══════════════════════════════════════════════════════════
+
+# Async IMAP client
+aioimaplib>=1.0.1
+
+# Post-Quantum Cryptography (Optional - advanced users)
+# liboqs-python>=0.8.0  # Uncomment if you need real PQ crypto
+# Note: Requires liboqs C library installed on system
+
+# Classical cryptography
+cryptography>=41.0.0
+
+# ═══════════════════════════════════════════════════════════
+# VOICE MODULE (STT + TTS)
+# ═══════════════════════════════════════════════════════════
+
+# Speech Recognition (STT)
+SpeechRecognition>=3.10.0
+
+# Audio I/O (Required for microphone)
+# PyAudio>=0.2.13  # Uncomment if using microphone
+# Note: May require portaudio system library
+
+# Text-to-Speech
+pyttsx3>=2.90
+
+# ═══════════════════════════════════════════════════════════
+# ANDROID MODULE (Optional - for Android deployment)
+# ═══════════════════════════════════════════════════════════
+
+# Android Java bridge (only for Android/Kivy builds)
+# pyjnius>=1.4.2  # Uncomment for Android
+# kivy>=2.2.0     # Uncomment for Android UI
+# kivymd>=1.1.1   # Uncomment for Material Design
+
+# ═══════════════════════════════════════════════════════════
+# AI INTEGRATIONS (Optional - based on your providers)
+# ═══════════════════════════════════════════════════════════
+
+# OpenAI / GPT (if using)
+# openai>=1.0.0
+
+# Google Gemini (ENABLED - Operation Dawn)
+google-generativeai>=0.3.0
+
+# Anthropic Claude (if using)
+# anthropic>=0.7.0
+
+# FastAPI Backend (Operation Dawn)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+httpx>=0.25.0
+
+# ═══════════════════════════════════════════════════════════
+# DEVELOPMENT TOOLS (Optional)
+# ═══════════════════════════════════════════════════════════
+
+# Testing
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+
+# Code quality
+# black>=23.0.0
+# flake8>=6.1.0
+# mypy>=1.7.0
+
+# ═══════════════════════════════════════════════════════════
+# DEPLOYMENT (Optional - for building APK)
+# ═══════════════════════════════════════════════════════════
+
+# Buildozer for Android APK builds
+# buildozer>=1.5.0
+
+# Cython for compiled modules
+# cython>=3.0.0
+
+# ═══════════════════════════════════════════════════════════
+# NOTES
+# ═══════════════════════════════════════════════════════════
+#
+# Installation:
+#   pip install -r requirements-alfa.txt
+#
+# For Android:
+#   pip install -r requirements-alfa.txt kivy kivymd pyjnius
+#
+# For full cryptography (advanced):
+#   # Install liboqs first: https://github.com/open-quantum-safe/liboqs
+#   pip install liboqs-python
+#
+# For microphone support:
+#   # Linux: sudo apt-get install portaudio19-dev
+#   # MacOS: brew install portaudio
+#   # Windows: pip install pipwin && pipwin install pyaudio
+#   pip install PyAudio
+#

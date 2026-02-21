@@ -1,0 +1,13 @@
+seat_enabled: true
+
+security:
+  cerber_enabled: true
+  max_task_length: 4000
+
+models:
+  allowed_roles:
+    architect: [claude, gpt]
+    integrator: [gpt, gemini, deepseek]
+    coder: [gpt, ollama_mistral]
+    tester: [gemini, deepseek]
+    analyst: [deepseek, gpt]

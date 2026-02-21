@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../../../CERBER_OFFLINE_WORK/.git"
+		},
+		{
+			"path": "../../../CERBER_OFFLINE_WORK/cerber_test"
+		},
+		{
+			"path": "../../../CERBER_OFFLINE_WORK/secrets"
+		},
+		{
+			"path": "../../../CERBER_OFFLINE_WORK/tools"
+		}
+	],
+	"settings": {
+		"powershell.cwd": "secrets"
+	}
+}
